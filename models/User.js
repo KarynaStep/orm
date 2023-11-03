@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasMany(models.Task, {
+        foreignKey: 'userId'
+      });
     }
   }
   User.init(
@@ -49,6 +52,9 @@ module.exports = (sequelize, DataTypes) => {
         field: "password_hash",
         type: DataTypes.TEXT,
         allowNull: false,
+        set(value) {
+          this.setDataValue("password", 'new_hash_password');
+        },
       },
       birthday: {
         type: DataTypes.DATEONLY,
@@ -59,8 +65,8 @@ module.exports = (sequelize, DataTypes) => {
             if (isAfter(new Date(value), new Date())) {
               throw new Error("check birthday");
             }
-          }
-        }
+          },
+        },
       },
       isMale: {
         type: DataTypes.BOOLEAN,
@@ -71,7 +77,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "User",
       underscored: true,
-      tableName: 'users'
+      tableName: "users",
     }
   );
   return User;

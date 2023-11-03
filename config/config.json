@@ -6,8 +6,7 @@
     "host": "localhost",
     "dialect": "postgres"
   },
-  "test": {
-  },
+  "test": {},
   "production": {
   }
 }
