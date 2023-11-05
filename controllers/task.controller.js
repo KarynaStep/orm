@@ -1,4 +1,3 @@
-const { where } = require("sequelize");
 const { Task, User } = require("../models");
 
 // module.exports.createTask = async (req, res, next) => {
@@ -23,12 +22,16 @@ module.exports.createTask = async (req, res, next) => {
 
 module.exports.getAllTasks = async (req, res, next) => {
   try {
-    const { userInstance } = req;
+    const { userInstance, pagination } = req;
     const tasks = await userInstance.getTasks({
-      where: {
-        model: User,
-        attributes: ["email"],
-      },
+      where: { isDone: false },
+      include: [
+        {
+          model: User,
+          attributes: ["email"],
+        },
+      ],
+      ...pagination,
     });
     if (tasks.length === 0) {
       return res.status(200).send({ date: "empty" });
@@ -41,15 +44,17 @@ module.exports.getAllTasks = async (req, res, next) => {
 
 module.exports.getAllTasks = async (req, res, next) => {
   try {
-    const { userInstance } = req;
+    const { userInstance, pagination } = req;
     const tasks = await userInstance.getTasks({
-      where: {
+      where: { isDone: false },
+      include: {
         model: User,
         attributes: ["email"],
       },
+      ...pagination,
     });
     if (tasks.length === 0) {
-      return res.status(404).send({ date: "empty" });
+      return res.status(200).send({ date: "empty" });
     }
     res.status(200).send({ date: tasks });
   } catch (error) {
@@ -59,10 +64,31 @@ module.exports.getAllTasks = async (req, res, next) => {
 
 module.exports.getTask = async (req, res, next) => {
   try {
-    const { task } = req;
-    const taskNew = await userInstance.getTask(task);
+    const { taskInstance } = req;
+    res.status(200).send({ date: taskInstance });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    res.status(200).send({ date: taskNew });
+
+module.exports.updateTask = async (req, res, next) => {
+  try {
+    const { taskInstance, body } = req;
+  const updateTask = await taskInstance.update(body, {
+  returning : true
+})
+    res.status(200).send({ date: updateTask });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.deleteTask = async (req, res, next) => {
+  try {
+    const { taskInstance } = req;
+    await taskInstance.destroy();
+    res.status(200).send({ date: taskInstance });
   } catch (error) {
     next(error);
   }
