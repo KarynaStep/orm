@@ -1,4 +1,6 @@
-const { Task, User } = require("../models");
+
+const LimitTasksError = require("../errors/LimitTasksError");
+const { User } = require("../models");
 
 // module.exports.createTask = async (req, res, next) => {
 //   try {
@@ -13,6 +15,10 @@ const { Task, User } = require("../models");
 module.exports.createTask = async (req, res, next) => {
   try {
     const { body, userInstance } = req;
+    const count = await userInstance.countTasks();
+    if (count >= 10) {
+      return next(new LimitTasksError('Task must be less or qual 10'))
+    }
     const newTask = await userInstance.createTask(body);
     res.status(201).send({ date: newTask });
   } catch (error) {
@@ -71,13 +77,12 @@ module.exports.getTask = async (req, res, next) => {
   }
 };
 
-
 module.exports.updateTask = async (req, res, next) => {
   try {
     const { taskInstance, body } = req;
-  const updateTask = await taskInstance.update(body, {
-  returning : true
-})
+    const updateTask = await taskInstance.update(body, {
+      returning: true,
+    });
     res.status(200).send({ date: updateTask });
   } catch (error) {
     next(error);

@@ -1,3 +1,5 @@
+
+const NotFoundError = require("../errors/NotFoundError");
 const { Task } = require("../models");
 
 module.exports.checkTask = async (req, res, next) => {
@@ -8,11 +10,11 @@ module.exports.checkTask = async (req, res, next) => {
     } = req;
     const [task] = await userInstance.getTasks({
       where: {
-        id: idTask
-      }
+        id: idTask,
+      },
     });
     if (!task) {
-      return res.status(404).send({data: 'task not found'})
+      return next(new NotFoundError('Tasks not found'));
     }
     req.taskInstance = task;
     next();
