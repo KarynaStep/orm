@@ -1,61 +1,23 @@
 const { Router } = require("express");
-const UserController = require("../controllers/user.controller");
-const TaskController = require("../controllers/task.controller"); 
-const MessageController = require("../controllers/message.controller"); 
 const { checkUser } = require("../middlewares/users.mw");
-const { checkTask } = require("../middlewares/tasks.mw");
-const { checkMessage } = require("../middlewares/messages.mw");
-const paginate = require("../middlewares/paginate.mw")
+const userRouter = require("./user.router");
+const taskRouter = require("./task.router");
+const messageRouter = require("./message.router");
+const groupV1Router = require("./groupV1.roiter");
+const groupV2Router = require("./groupV2.roiter");
 
 const router = Router();
 
-router.post("/users", UserController.createUser);
-router.get("/users",paginate,  UserController.getAllUsers);
-router.patch("/users/:idUser", checkUser, UserController.updateUserInstance);
-router.delete("/users/:idUser", checkUser, UserController.deleteUserInstance);
+router.use('/users', userRouter)
 
-router.post("/users/:idUser/tasks", checkUser, TaskController.createTask);
-router.get("/users/:idUser/tasks",paginate, checkUser, TaskController.getAllTasks);
-router.get("/users/:idUser/tasks/:idTask", checkUser, checkTask, TaskController.getTask);
-router.patch(
-  "/users/:idUser/tasks/:idTask",
-  checkUser,
-  checkTask,
-  TaskController.updateTask
-);
-router.delete(
-  "/users/:idUser/tasks/:idTask",
-  checkUser,
-  checkTask,
-  TaskController.deleteTask
-);
+router.use('/users/:idUser/tasks', checkUser, taskRouter);
 
-router.post(
-  "/users/:idUser/messages",
-  checkUser,
-  MessageController.createMessage
-);
-router.get(
-  "/users/:idUser/messages",
-  paginate,
-  checkUser,
-  MessageController.getAllMessages
-);
-router.get(
-  "/users/:idUser/messages/:idMessage",
-  checkUser, checkMessage, MessageController.getMessage
-);
-router.patch(
-  "/users/:idUser/messages/:idMessage",
-  checkUser,
-  checkMessage,
-  MessageController.updateMessage
-);
-router.delete(
-  "/users/:idUser/messages/:idMessage",
-  checkUser,
-  checkMessage,
-  MessageController.deleteMessage
-);
+router.use("/users/:idUser/messages", checkUser, messageRouter);
+
+router.use('/groups', groupV1Router)
+
+router.use("/users/:idUser/groups",checkUser, groupV2Router);
+
+
 
 module.exports = router;
