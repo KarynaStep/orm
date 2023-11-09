@@ -1,6 +1,0 @@
-POST http://localhost:3000/api/users/24/groups HTTP/1.1
-Content-Type: application/json
-
-{
-  "name": ",l,l,ljijo"
-}
